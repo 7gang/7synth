@@ -1,9 +1,12 @@
 import PySimpleGUI as sg
+DEBUGGING = True
 
 
 def build():
     # all the stuff inside the GUI window
-    return [[sg.Text("WAVEFORM")],
+    return [[sg.Image('./logo.png')],
+            [sg.Text('----------------------------------------------------------------------------')],
+            [sg.Text("WAVEFORM")],
             [sg.Listbox(['SINE', 'SQUARE', 'SAW'],
                         enable_events=True,
                         size=(None, 3),
@@ -11,6 +14,7 @@ def build():
                         default_values='SINE',
                         key='wave'),
              sg.Checkbox('Play preview audio', default=True, key='tick')],
+            [sg.Text('----------------------------------------------------------------------------')],
             [sg.Text("LOW PASS FILTER")],
             [sg.Slider(range=(0, 1), orientation='h', size=(34, 20), default_value=0, resolution=.1,
                        enable_events=True, key='low')],
@@ -20,9 +24,9 @@ def build():
             [sg.Text("VOLUME")],
             [sg.Slider(range=(0.0, 1.0), orientation='h', size=(34, 20), default_value=.5, resolution=.1,
                        enable_events=True, key='vol')],
-            [sg.Text("", size=(18, 1), key='text')],
+            [sg.Text('----------------------------------------------------------------------------')],
             [sg.Button("QUIT", key='QUIT'),
-             sg.Text("Press a key to play a note...")]]
+             sg.Text("Press a key to play a note...", key='text')]]
 
 
 class GUI:
@@ -34,7 +38,8 @@ class GUI:
         layout = build()
         self.window = sg.Window('7SYNTH ULTRA MEGA-XTREME: ULTIMATE EDITION', layout,
                                 return_keyboard_events=True,
-                                use_default_focus=False)
+                                use_default_focus=False,
+                                icon='icon.ico')
         self.window.finalize()  # dunno if this is strictly needed, seemed to work fine without
 
         # create other class variables
@@ -66,10 +71,11 @@ class GUI:
             return self.close()
         if len(event) == 1:
             self.synth.play(event[0])
-            text_elem.update(value='%s - %s' % (event, ord(event)))
+            if DEBUGGING:
+                text_elem.update(value='%s - %s' % (event, ord(event)))
         if event is not None:
-            text_elem.update("DEBUGGING: %s" % event)
-            pass
+            if DEBUGGING:
+                text_elem.update("DEBUGGING: %s" % event)
 
     def close(self):
         """ Closes the GUI, ending the program """
