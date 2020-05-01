@@ -2,15 +2,15 @@ import PySimpleGUI as sg
 
 
 def build():
-    # all the stuff inside the gui window
-    return [[sg.Text("Press a key to play a note...")],
-            [sg.Text("WAVEFORM")],
+    # all the stuff inside the GUI window
+    return [[sg.Text("WAVEFORM")],
             [sg.Listbox(['SINE', 'SQUARE', 'SAW'],
                         enable_events=True,
                         size=(None, 3),
                         auto_size_text=True,
                         default_values='SINE',
-                        key='wave')],
+                        key='wave'),
+             sg.Checkbox('Play preview audio', default=True, key='tick')],
             [sg.Text("LOW PASS FILTER")],
             [sg.Slider(range=(0, 1), orientation='h', size=(34, 20), default_value=0, resolution=.1,
                        enable_events=True, key='low')],
@@ -21,7 +21,8 @@ def build():
             [sg.Slider(range=(0.0, 1.0), orientation='h', size=(34, 20), default_value=.5, resolution=.1,
                        enable_events=True, key='vol')],
             [sg.Text("", size=(18, 1), key='text')],
-            [sg.Button("QUIT", key='QUIT')]]
+            [sg.Button("QUIT", key='QUIT'),
+             sg.Text("Press a key to play a note...")]]
 
 
 class GUI:
@@ -43,19 +44,23 @@ class GUI:
     def update(self):
         """ Updates the GUI, invoking Synth """
 
-        # event Loop to process "events" and get the "values" of the inputs
+        # process "events" and get the "values" of the inputs
         event, values = self.window.read()
         text_elem = self.window['text']
         low_pass_slider = values['low']
         ban_pass_slider = values['ban']
         volume_slider = values['vol']
         waveform = values['wave'][0]
-        # print("low: %s, band: %s" % (low_pass_slider, band_pass_slider))
-        # print(event)
-        self.synth.set(waveform=waveform,
+        play_preview_audio = values['tick']
+
+        # pass values to Synth
+        self.synth.set(play_preview_audio,
+                       waveform=waveform,
                        low_pass=low_pass_slider,
                        band_pass=ban_pass_slider,
                        volume=volume_slider)
+
+        # parse GUI input
         if event in ("QUIT", None):
             print("Quiting 7SYNTH ULTRA MEGA-XTREME: ULTIMATE EDITION...")
             return self.close()

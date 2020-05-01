@@ -10,7 +10,7 @@ class Synth:
         self.volume = 0.5       # default volume
         self.key = 'c'          # default note
 
-    def set(self, **kwargs):
+    def set(self, preview, **kwargs):
         """ Sets playback variables, restarting playback if a value is changed """
 
         settings_changed = False
@@ -25,7 +25,7 @@ class Synth:
                 print("updated %s from %s to %s" % (name, variable, value))
 
         # update playback if playback variables changed
-        if settings_changed:
+        if preview and settings_changed:
             self.play()
 
     def play(self, key=None):
