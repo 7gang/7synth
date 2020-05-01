@@ -1,14 +1,14 @@
-#import sounddevice as sd
+#TODO: importing sounddevice as sd gives errors, which might become a problem...
 
 
 class Synth:
 
     def __init__(self):
         self.waveform = 'SINE'  # can also be "SQUARE" or "SAW"
-        self.low_pass = 0.0
-        self.band_pass = 0.0
-        self.volume = 0.5
-        self.key = 'c'
+        self.low_pass = 0.0     # level of low pass filter
+        self.band_pass = 0.0    # level of band pass filter
+        self.volume = 0.5       # default volume
+        self.key = 'c'          # default note
 
     def set(self, **kwargs):
         """ Sets playback variables, restarting playback if a value is changed """
@@ -23,28 +23,27 @@ class Synth:
                 settings_changed = True
                 self.__dict__[name] = value
                 print("updated %s from %s to %s" % (name, variable, value))
-        # update playback if playing
+
+        # update playback if playback variables changed
         if settings_changed:
             self.play()
 
     def play(self, key=None):
         """ Starts playback """
 
-        # save key
-        if not key:
-            key = self.key
-        self.key = key
-        # stop before starting
+        # replace key and stop playback before starting it again
+        if key:
+            self.key = key
         self.stop()
 
-        # TODO: play note in the given key continuously...
+        # TODO: continuously play note in the key given by self.key...
 
         print("playing note in key %s with waveform %s, low pass %s, and band pass %s"
-              % (key, self.waveform, self.low_pass, self.band_pass))
+              % (self.key, self.waveform, self.low_pass, self.band_pass))
 
     def stop(self):
         """ Stops playback. This method is called preemptively, even when nothing is playing """
         # TODO:                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ must be able to handle this
 
-        # TODO: stop playing note...
+        # TODO: stop playing...
         pass
