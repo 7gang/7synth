@@ -1,4 +1,5 @@
-#TODO: importing sounddevice as sd gives errors, which might become a problem...
+import sounddevice as sd
+from waves import sine, square, saw
 
 
 class Synth:
@@ -8,7 +9,12 @@ class Synth:
         self.low_pass = 0.0     # level of low pass filter
         self.band_pass = 0.0    # level of band pass filter
         self.volume = 0.5       # default volume
-        self.key = 'c'          # default note
+        self.key = 'a'          # default note
+        self.waves = {          # all the wavezzz
+            'SINE': sine,
+            'SQUARE': square,
+            'SAW': saw
+        }
 
     def set(self, preview, **kwargs):
         """ Sets playback variables, restarting playback if a value is changed """
@@ -36,14 +42,13 @@ class Synth:
             self.key = key
         self.stop()
 
-        # TODO: continuously play note in the key given by self.key...
+        # play sound
+        sd.play(self.waves.get(self.waveform)(self.key, self.volume / 10))
 
         print("playing note in key %s with waveform %s, low pass %s, and band pass %s"
               % (self.key, self.waveform, self.low_pass, self.band_pass))
 
     def stop(self):
         """ Stops playback. This method is called preemptively, even when nothing is playing """
-        # TODO:                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ must be able to handle this
 
-        # TODO: stop playing...
-        pass
+        sd.stop()

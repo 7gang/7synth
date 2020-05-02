@@ -1,84 +1,38 @@
 import numpy as np
-import keyboard
-import sounddevice as sd
 from scipy import signal
-import matplotlib.pyplot as plt
 
-notes = {
-    "A4": 440,
-    "B4": 494,
-    "C4": 523,
-    "D4": 587,
-    "E4": 660,
-    "F4": 698,
-    "G4": 784,
-    "A5": 880
+notes = {  # maps keyboard keys to notes
+    "a": 440,  # A4
+    "s": 494,  # B4
+    "d": 523,  # C4
+    "f": 587,  # D4
+    "g": 660,  # E4
+    "h": 698,  # F4
+    "j": 784,  # G4
+    "k": 880   # A5
 }
 
 
-class Waves:
+def wave(note, duration=1):
+    freq = notes[note]                             # Hz
+    sampling_rate = 44100                          # Hz
+    n_data = duration * sampling_rate
+    time = np.arange(0, n_data).T / sampling_rate  # s
+    init_phase = np.pi / 2                         # rad
 
-    def __init__(self):
-        return None
-
-    def sine(self, note, amplitude):
-        self.amp = amplitude
-        self.freq = note  # Hz
-        samplingFreq = 44100  # Hz
-        nData = 10 * samplingFreq
-        time = np.arange(0, nData).T / samplingFreq  # s
-        initPhase = np.pi / 2  # rad
-        sine = self.amp * np.cos(2 * np.pi * self.freq * time + initPhase)
-        return sine
-
-    def square(self, note, amplitude):
-        self.amp = amplitude
-        self.freq = note  # Hz
-        samplingFreq = 44100  # Hz
-        nData = 10 * samplingFreq
-        time = np.arange(0, nData).T / samplingFreq  # s
-        initPhase = np.pi / 2  # rad
-
-        # Using the signal toolbox from scipy for the sawtooth:
-        square = self.amp * signal.square(2 * np.pi * self.freq * time + initPhase, duty=0.5)
-        # Scale the waveform to a certain amplitude and apply an offset:
-        return square
-
-    def saw(self, note, amplitude):
-        self.amp = amplitude
-        self.freq = note  # Hz
-        samplingFreq = 44100  # Hz
-        nData = 10 * samplingFreq
-        time = np.arange(0, nData).T / samplingFreq  # s
-        initPhase = np.pi / 2  # rad
-
-        # Using the signal toolbox from scipy for the sawtooth:
-        saw = self.amp * signal.sawtooth(2 * np.pi * self.freq * time + initPhase)
-        # Scale the waveform to a certain amplitude and apply an offset:
-        return saw
+    return freq, time, init_phase
 
 
-x = Waves()
-
-while True:  # making a loop
-
-    if keyboard.is_pressed('q'):  # if key 'q' is pressed
-        sd.stop()
-        freq = notes["A4"]
-        sinusoid = x.sine(notes["A4"], 1)
-        sd.play(sinusoid)
-
-    if keyboard.is_pressed('w'):
-        sd.stop()
-        freq = notes["A4"]
-        square = x.square(notes["A4"], 1)
-        sd.play(square)
-        t = np.linspace(0, 1, 500)
-
-    if keyboard.is_pressed('e'):
-        sd.stop()
-        freq = notes["A4"]
-        saw = x.saw(notes["A4"], 1)
-        sd.play(saw)
+def sine(note, amplitude):
+    freq, time, init_phase = wave(note)
+    return amplitude * np.cos(2 * np.pi * freq * time + init_phase)
 
 
+def square(note, amplitude):
+    freq, time, init_phase = wave(note)
+    return amplitude * signal.square(2 * np.pi * freq * time + init_phase, duty=0.5)
+
+
+def saw(note, amplitude):
+    freq, time, init_phase = wave(note)
+    return amplitude * signal.sawtooth(2 * np.pi * freq * time + init_phase)
