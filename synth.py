@@ -1,5 +1,5 @@
 import sounddevice as sd
-from waves import sine, square, saw
+import waves
 
 
 class Synth:
@@ -10,13 +10,13 @@ class Synth:
         self.band_pass = 0.0    # level of band pass filter
         self.volume = 0.5       # default volume
         self.key = 'a'          # default note
-        self.waves = {          # all the wavezzz
-            'SINE': sine,
-            'SQUARE': square,
-            'SAW': saw
+        self.wave_map = {       # all the waves
+            'SINE': waves.sine,
+            'SQUARE': waves.square,
+            'SAW': waves.saw
         }
 
-    def set(self, preview, **kwargs):
+    def set(self, play_preview, **kwargs):
         """ Sets playback variables, restarting playback if a value is changed """
 
         settings_changed = False
@@ -31,7 +31,7 @@ class Synth:
                 print("updated %s from %s to %s" % (name, variable, value))
 
         # update playback if playback variables changed
-        if preview and settings_changed:
+        if play_preview and settings_changed:
             self.play()
 
     def play(self, key=None):
@@ -39,11 +39,13 @@ class Synth:
 
         # replace key and stop playback before starting it again
         if key:
+            if key not in waves.notes:  # cancel method if pressed key is not supported
+                return
             self.key = key
         self.stop()
 
         # play sound
-        sd.play(self.waves.get(self.waveform)(self.key, self.volume / 10))
+        sd.play(self.wave_map.get(self.waveform)(self.key, self.volume / 10))
 
         print("playing note in key %s with waveform %s, low pass %s, and band pass %s"
               % (self.key, self.waveform, self.low_pass, self.band_pass))
