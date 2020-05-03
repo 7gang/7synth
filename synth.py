@@ -1,6 +1,6 @@
 import sounddevice as sd
 import waves
-
+import numpy as np
 
 class Synth:
 
@@ -36,17 +36,21 @@ class Synth:
 
     def play(self, key=None):
         """ Starts playback """
-
         # replace key and stop playback before starting it again
         if key:
             if key not in waves.notes:  # cancel method if pressed key is not supported
                 return
             self.key = key
         self.stop()
-
+        """Generating a signal"""
+        signal = self.wave_map.get(self.waveform)(self.key, self.volume / 10)
+        """Applying a filter fo the signal if the filter is turned on(>0)"""
+        if self.low_pass > 0:
+            signal = self.lowpass(signal, self.low_pass)
+        """if self.band_pass > 0:
+            signal = #bandpass processing"""
         # play sound
-        sd.play(self.wave_map.get(self.waveform)(self.key, self.volume / 10))
-
+        sd.play(signal)
         print("playing note in key %s with waveform %s, low pass %s, and band pass %s"
               % (self.key, self.waveform, self.low_pass, self.band_pass))
 
@@ -54,3 +58,13 @@ class Synth:
         """ Stops playback. This method is called preemptively, even when nothing is playing """
 
         sd.stop()
+    """Filtering section"""
+    def lowpass(self, signal, cutoff):
+        filtersignal = np.zeros_like(signal)
+        dt = 1/44100 #calculating the descrete time
+        tau = 1/cutoff
+        a = dt / tau
+        filtersignal[0] = a * signal[0]
+        for i in range(1, 44100 - 1):
+             filtersignal[i] = filtersignal[i - 1] + a * (signal[i] - filtersignal[i - 1])
+        return filtersignal
