@@ -1,6 +1,7 @@
 import sounddevice as sd
 import waves
 import numpy as np
+import scipy.signal as sp
 
 class Synth:
 
@@ -47,8 +48,8 @@ class Synth:
         """Applying a filter fo the signal if the filter is turned on(>0)"""
         if self.low_pass > 0:
             signal = self.lowpass(signal, self.low_pass)
-        """if self.band_pass > 0:
-            signal = #bandpass processing"""
+        if self.band_pass > 0:
+            signal = self.bandpass(signal, self.band_pass)
         # play sound
         sd.play(signal)
         print("playing note in key %s with waveform %s, low pass %s, and band pass %s"
@@ -67,4 +68,18 @@ class Synth:
         filtersignal[0] = a * signal[0]
         for i in range(1, 44100 - 1):
              filtersignal[i] = filtersignal[i - 1] + a * (signal[i] - filtersignal[i - 1])
+        return filtersignal
+
+    def bandpass(self, signal, cutoff):
+        filtersignal = np.zeros_like(signal)
+        lowcut = cutoff - (cutoff/2)
+        highcut = cutoff + (cutoff/2)
+        nyq = 0.5 * 44100
+        low = lowcut / nyq
+        high = highcut / nyq
+        order = 5
+        b, a = sp.butter(order, [low, high], btype='band')
+        filtersignal = sp.lfilter(b, a, signal)
+
+
         return filtersignal
