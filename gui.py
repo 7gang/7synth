@@ -19,7 +19,7 @@ def build():
             [sg.Slider(range=(0, 20000), orientation='h', size=(34, 20), default_value=0, resolution=50,
                        enable_events=True, key='low')],
             [sg.Text("BAND PASS FILTER")],
-            [sg.Slider(range=(0.0, 20000.0), orientation='h', size=(34, 20), default_value=0, resolution=50,
+            [sg.Slider(range=(0.0, 14000.0), orientation='h', size=(34, 20), default_value=0, resolution=50,
                        enable_events=True, key='ban')],
             [sg.Text("VOLUME")],
             [sg.Slider(range=(0.0, 1.0), orientation='h', size=(34, 20), default_value=.5, resolution=.1,
