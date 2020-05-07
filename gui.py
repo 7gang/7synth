@@ -1,5 +1,4 @@
 import PySimpleGUI as sg
-DEBUGGING = True
 
 
 def build():
@@ -26,10 +25,11 @@ def build():
                        enable_events=True, key='vol')],
             [sg.Text('----------------------------------------------------------------------------')],
             [sg.Button("QUIT", key='QUIT'),
-             sg.Text("Press a key to play a note...", key='text')]]
+             sg.Text("Press keys A,S,D,...,K to play")]]
 
 
 class GUI:
+    """ Manages the Graphical User Interface of the application, invoking Synth.py """
 
     def __init__(self, synth):
         sg.theme('DarkAmber')  # add a touch of color
@@ -51,7 +51,6 @@ class GUI:
 
         # process "events" and get the "values" of the inputs
         event, values = self.window.read()
-        text_elem = self.window['text']
         low_pass_slider = values['low']
         ban_pass_slider = values['ban']
         volume_slider = values['vol']
@@ -71,11 +70,6 @@ class GUI:
             return self.close()
         if len(event) == 1:
             self.synth.play(event[0])
-            if DEBUGGING:
-                text_elem.update(value='%s - %s' % (event, ord(event)))
-        if event is not None:
-            if DEBUGGING:
-                text_elem.update("DEBUGGING: %s" % event)
 
     def close(self):
         """ Closes the GUI, ending the program """

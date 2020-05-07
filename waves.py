@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import signal
 
-notes = {  # maps keyboard keys to notes
+notes = {  # maps keyboard keys to musical notes
     "a": 440,  # A4
     "s": 494,  # B4
     "d": 523,  # C4
@@ -14,6 +14,8 @@ notes = {  # maps keyboard keys to notes
 
 
 def wave(note, duration=1):
+    """ Base method for generating basic wave data that must then be transformed into specialized waveforms """
+
     freq = notes[note]                             # Hz
     sampling_rate = 44100                          # Hz
     n_data = duration * sampling_rate
@@ -24,15 +26,21 @@ def wave(note, duration=1):
 
 
 def sine(note, amplitude):
+    """ Generates a sine wave at given note and with given amplitude """
+
     freq, time, init_phase = wave(note)
     return amplitude * np.cos(2 * np.pi * freq * time + init_phase)
 
 
 def square(note, amplitude):
+    """ Generates a square wave at given note and with given amplitude """
+
     freq, time, init_phase = wave(note)
     return amplitude * signal.square(2 * np.pi * freq * time + init_phase, duty=0.5)
 
 
 def saw(note, amplitude):
+    """ Generates a saw wave at given note and with given amplitude """
+
     freq, time, init_phase = wave(note)
     return amplitude * signal.sawtooth(2 * np.pi * freq * time + init_phase)
